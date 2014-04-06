@@ -1,0 +1,30 @@
+{
+    "name": "intrader",
+    "version": "0.0.1",
+    "description": "e-commerce shopping cart npm module",
+    "homepage": "https://github.com/ImanimalXI/inTrader",
+    "keywords": [
+        "shop",
+        "cart",
+        "ecommerce",
+        "webshop",
+        "store"
+    ],
+    "licenses": [
+        {
+            "type": "MIT"
+        }
+    ],
+    "author": {
+        "name": "IamanimalXI",
+        "email": "maximilian.moulettes@gmail.com"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/ImanimalXI/inTrader.git"
+    },
+    "bugs": {
+        "url": "https://github.com/ImanimalXI/inTrader/issues"
+    },
+    "main": "index.js"
+}
