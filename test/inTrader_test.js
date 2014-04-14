@@ -101,14 +101,14 @@ describe('inTrader', function() {
 
     it('should have a total weight', function(){
         var cart = new inTrader();
-        cart.should.have.property('weight');
-        cart.weight().should.not.be.below(0);
-        cart.weight().should.be.a.Number;
+        cart.should.have.property('totalWeight');
+        cart.totalWeight().should.not.be.below(0);
+        cart.totalWeight().should.be.a.Number;
 
         //TODO handle incorrect weitht values
     });
 
-    it('should have VAT amout and rate', function(){
+    it('should have VAT amount and rate', function(){
         var cart = new inTrader();
 
         cart.should.have.property('vat');
@@ -118,6 +118,13 @@ describe('inTrader', function() {
         cart.vat().rate().should.not.be.below(0);
         cart.vat().rate().should.not.be.NaN;
         cart.vat().rate().should.be.a.Number;
+
+        cart.addItem({'ID' : 101, 'itemNumber' : 'product_1', 'price': 100, 'weight': 120});
+
+        var sum = cart.itemTotal();
+        var vat = cart.vatTotal();
+       //vat.should.equal(20);
+        //sum.should.equal(100);
     });
 
     it('should have a Customer with ID, first name and last name', function(){
@@ -149,6 +156,8 @@ describe('inTrader', function() {
         cart.customer().should.have.property('vatNumber');
         //cart.should.have.keys('foo', 'baz');
     });
+
+    // TODO add more Customer testing for the properties
 
     it('should return Customer first and last name as name', function(){
         var cart = new inTrader();
@@ -196,7 +205,7 @@ describe('inTrader', function() {
         var cart = new inTrader();
 
         cart.shipment().fee(30);
-        cart.subTotal().should.be = 30;
+        cart.subTotal().should.equal(30);
 
         cart.shipment().fee().should.not.be.below(0);
         //TODO set zone make sure it's a number
@@ -205,11 +214,12 @@ describe('inTrader', function() {
     it('it should be able to add item', function(){
         var cart = new inTrader();
         cart.addItem({'ID' : 101, 'itemNumber' : 'product_1', 'price': 12.5, 'weight': 120});
+        cart.items().should.be.a.Array;
         cart.items().length.should.equal(1);
-        cart.items()[0].ID().should.be = 101;
-        cart.items()[0].itemNumber().should.be = 'product_1';
-        cart.items()[0].price().should.be = 12.5;
-        cart.items()[0].weight().should.be = 120;
+        cart.items()[0].ID().should.equal(101);
+        cart.items()[0].itemNumber().should.equal('product_1');
+        cart.items()[0].price().should.equal(12.5);
+        cart.items()[0].weight().should.equal(120);
 
         cart.addItem({});
         cart.items()[1].should.have.property('ID');
@@ -230,16 +240,17 @@ describe('inTrader', function() {
         cart.addItem(item);
 
         cart.items().length.should.equal(1);
-        cart.items()[0].ID().should.be = 101;
-        cart.items()[0].itemNumber().should.be = 'product_1';
-        cart.items()[0].price().should.be = 12.5;
-        cart.items()[0].weight().should.be = 120;
+        cart.items()[0].ID().should.equal(101);
+        cart.items()[0].itemNumber().should.equal('product_1');
+        cart.items()[0].price().should.equal(12.5);
+        cart.items()[0].weight().should.equal(120);
     });
 
     it('it should be able to add a inTraderCurrency', function(){
         var cart = new inTrader();
         var currency = new inTraderCurrency();
 
+        cart.currencies().should.be.a.Array;
         currency.code('USD');
         currency.rate(1);
         currency.symbol('$');
@@ -270,13 +281,27 @@ describe('inTrader', function() {
 
     });
 
+    it('it should be able to handle an incorrect currency code', function(){
+        var currency = new inTraderCurrency();
+        currency.code('USDA');
+        currency.code().length.should.equal(3);
+        currency.code('');
+        currency.code().length.should.equal(3);
+        currency.code(0);
+        currency.code().length.should.equal(3);
+
+        currency.code('usd');
+        currency.code().should.equal('USD');
+    });
+
+
     it('it should be able to handle an incorrect item', function(){
         var cart = new inTrader();
         cart.addItem({'ID' : [] ,'itemNumber' : 'product_1', 'price': 12.5, 'weight': 120});
 
         cart.items().length.should.equal(1);
         cart.items()[0].should.have.property('ID');
-        cart.items()[0].itemNumber().should.be = 'product_1';
+        cart.items()[0].itemNumber().should.equal('product_1');
         cart.items()[0].ID().should.be.a.Number;
 
         cart.addItem({'ID' : {} ,'itemNumber' : 'product_2', 'price': 12.5, 'weight': 120});
@@ -289,7 +314,7 @@ describe('inTrader', function() {
         cart.items().length.should.equal(3);
         cart.items()[2].should.have.property('itemNumber');
         cart.items()[2].should.have.property('price');
-        cart.items()[2].price().should.be = 12.5;
+        cart.items()[2].price().should.equal(12.5);
         cart.items()[2].itemNumber().should.be = 'product_3';
         cart.items()[2].price().should.be.a.Number;
 
@@ -297,7 +322,7 @@ describe('inTrader', function() {
         cart.items().length.should.equal(4);
         cart.items()[3].should.have.property('itemNumber');
         cart.items()[3].should.have.property('price');
-        cart.items()[3].price().should.be = 0;
+        cart.items()[3].price().should.equal(0);
         cart.items()[3].itemNumber().should.be = 'product_4';
         cart.items()[3].price().should.be.a.Number;
 
@@ -305,13 +330,13 @@ describe('inTrader', function() {
         cart.items().length.should.equal(5);
         cart.items()[4].should.have.property('itemNumber');
         cart.items()[4].should.have.property('qty');
-        cart.items()[4].qty().should.be = 0;
+        cart.items()[4].qty().should.equal(0);
         cart.items()[4].itemNumber().should.be = 'product_4';
         cart.items()[4].qty().should.be.a.Number;
 
         cart.items()[4].qty('a');
         cart.items()[4].qty().should.be.a.Number;
-        cart.items()[4].qty().should.be = 0;
+        cart.items()[4].qty().should.equal(0);
 
         cart.subTotal().should.be = 137.5;
 
@@ -494,14 +519,13 @@ describe('inTrader', function() {
         cart.addItem({'ID' : 102, 'itemNumber' : 'product_2', 'price': 22.5, 'weight': 120});
         cart.reset();
 
-        cart.subTotal().should.be = 0;
-        cart.itemTotal().should.be = 0;
-        cart.weight().should.be = 0;
-        cart.items().length.should.be = 0;
-        cart.shipment().fee().should.be = 0;
-        cart.payment().fee().should.be = 0;
+        cart.subTotal().should.equal(0);
+        cart.itemTotal().should.equal(0);
+        cart.totalWeight().should.equal(0);
+        cart.items().length.should.equal(0);
+        cart.shipment().fee().should.equal(0);
+        cart.payment().fee().should.equal(0);
         cart.customer().should.be.a.Object;
-        //TODO clear
     });
 
     it('should have a currency', function(){
@@ -512,7 +536,7 @@ describe('inTrader', function() {
 
         cart.addItem({'ID' : 101, 'itemNumber' : 'product_1', 'price': 12.5, 'weight': 120})
 
-        cart.itemTotal.should.be = 12.5;
+        cart.itemTotal().should.equal(12.5);
     });
 
     it('it should be able to add currency', function(){
@@ -526,14 +550,14 @@ describe('inTrader', function() {
         cart.addCurrency({'code' : 'GBP', 'rate' : 0.093750761});
         cart.currencies().length.should.equal(3);
 
-        cart.itemTotal('SEK').should.be = 12.5;
-        cart.itemTotal('EUR').should.be = 1.421;
-        cart.itemTotal('GBP').should.be = 1.17188451;
+        cart.itemTotal('SEK').should.equal(12.5);
+        cart.itemTotal('EUR').should.equal(1.421);
+        cart.itemTotal('GBP').should.equal(1.1718845125);
 
         cart.baseCurrency('EUR');
-        cart.itemTotal.should.be = 1.421;
+        cart.itemTotal().should.equal(1.421);
         cart.baseCurrency('GBP');
-        cart.itemTotal.should.be = 1.17188451;
+        cart.itemTotal().should.equal(1.1718845125);
     });
 
     it('it should be able to remove currency', function(){
@@ -549,14 +573,13 @@ describe('inTrader', function() {
 
         cart.removeCurrency('GBP');
         cart.currencies().length.should.equal(0);
-        // TODO Make sure the base currency is a string lenght of 3 chars and in upper case
     });
 
     it('it should be possible to update currency', function(){
         var cart = new inTrader();
         cart.addItem({'ID' : 101, 'itemNumber' : 'product_1', 'price': 12.5, 'weight': 120});
         cart.addCurrency({'code' : 'EUR', 'rate' : 1.11368, 'symbol': '€'});
-        cart.itemTotal.should.be = 13.921;
+        cart.itemTotal('EUR').should.equal(13.921);
 
         cart.updateCurrency({'code' : 'EUR', 'rate' : 1.21368});
 
@@ -564,10 +587,91 @@ describe('inTrader', function() {
         cart.currencies()[0].code().should.equal('EUR');
         cart.currencies()[0].rate().should.equal(1.21368);
 
-        cart.itemTotal.should.be = 15.171;
+        cart.itemTotal().should.equal(15.171000000000001);
+    });
+
+    it('should be able to handle a complete order', function() {
+        var cart = new inTrader();
+
+        cart.vat().rate(0.25);
+
+        cart.addItem({'ID' : 1, 'itemNumber' : 'product_1', 'price': 12.5, 'weight': 122});
+        cart.addItem({'ID' : 2, 'itemNumber' : 'product_2', 'price': 22.5, 'weight': 100});
+        cart.addItem({'ID' : 3, 'itemNumber' : 'product_3', 'price': 2.5, 'weight': 20});
+        cart.addItem({'ID' : 4, 'itemNumber' : 'product_4', 'price': 8.75, 'weight': 28});
+        cart.addItem({'ID' : 5, 'itemNumber' : 'product_5', 'price': 125, 'weight': 1200});
+
+        cart.totalWeight().should.equal(1470);
+        cart.itemTotal().should.equal(171.25);
+        cart.subTotal().should.equal(171.25);
+
+        cart.shipment().fee(75);
+        cart.payment().fee(4.78);
+        cart.itemTotal().should.equal(171.25);
+        cart.subTotal().should.equal(251.03);
+
+        cart.vatTotal().should.equal(42.8125);
+
+        cart.payment().registered().should.be.false;
+
+        cart.addCurrency({'code' : 'SEK', 'rate' : 1});
+        cart.currencies().length.should.equal(1);
+        cart.addCurrency({'code' : 'EUR', 'rate' : 0.11368, 'symbol': '€'});
+        cart.addCurrency({'code' : 'GBP', 'rate' : 0.093750761});
+        cart.addCurrency({'code' : 'USD', 'rate' : 0.152744});
+        cart.currencies().length.should.equal(4);
+
+        cart.itemTotal().should.equal(171.25);
+        cart.subTotal().should.equal(251.03);
+        cart.itemTotal('SEK').should.equal(171.25);
+        cart.subTotal('SEK').should.equal(251.03);
+
+        cart.itemTotal('EUR').should.equal(19.4677);
+        cart.itemTotal('GBP').should.equal(16.05481782125);
+        cart.itemTotal('USD').should.equal(26.15741);
+
+        cart.subTotal('EUR').should.equal(28.5370904);
+        cart.subTotal('GBP').should.equal(23.53425353383);
+        cart.subTotal('USD').should.equal(38.343326319999996);
+
+        cart.vatTotal('EUR').should.equal(4.866925);
+        cart.vatTotal('GBP').should.equal(4.0137044553125);
+        cart.vatTotal('USD').should.equal(6.5393525);
+
+        cart.customer().firstName('Ragnar');
+        cart.customer().lastName('Röök');
+        cart.customer().customerNumber('-');
+        cart.customer().pinNumber('560312-1212');
+        cart.customer().address('Valhallavägen 7');
+        cart.customer().address2('c/o Sleipner Johansson');
+        cart.customer().zip('112 34');
+        cart.customer().city('Lokeborg');
+        cart.customer().country('Sweden');
+        cart.customer().countryCode('se');
+        cart.customer().deliveryAddress('');
+        cart.customer().deliveryZip('');
+        cart.customer().deliveryCity('');
+        cart.customer().email('ragnar.rook@vhammaren.se');
+        cart.customer().mobileNumber('0737212345');
+        cart.customer().company('AB BB');
+        cart.customer().vatNumber('SE560312121201');
+
+        cart.payment().registered(true);
+        cart.payment().registered().should.be.true;
+
+        cart.reset();
+        cart.payment().registered().should.be.false;
+
     });
 
     //TODO add promo code
     //TODO add discount
+    //TODO Shipment delivered
+    //TODO Email validation
+    //TODO valid country code format
+    //TODO Separte Objects test
+
 
 });
+
+require('./inTraderCustomer_test.js');

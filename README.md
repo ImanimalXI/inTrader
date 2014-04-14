@@ -181,6 +181,16 @@ var cart = new inTrader();
 cart.reset();
 ```
 
+## .vatTotal
+Return the vat total based on all the items in cart
+
+```js
+var cart = new inTrader();
+cart.addItem({'ID' : 101, 'itemNumber' : 'product_1', 'price': 12.5, 'weight': 120});
+cart.vat().rate(0.25); //Set the vat rate to 25%
+cart.vatTotal() // 3.125,
+```
+
 ## .itemTotal
 Return the total sum of all items in cart
 
@@ -188,7 +198,9 @@ Return the total sum of all items in cart
 var cart = new inTrader();
 cart.addItem({'ID' : 101, 'itemNumber' : 'product_1', 'price': 12.5, 'weight': 120});
 cart.addCurrency({'code' : 'EUR', 'rate' : 1.11368, 'symbol': '€'});
-cart.itemTotal() //13.921;
+cart.itemTotal() // 13.921, The first added currency will serve as base currency an it's rate will be used to calculate the total (12.5 * 1.11368);
+cart.itemTotal('EUR') //13.921, Same as previous since this matches the base currency;
+
 ```
 
 ## .subTotal
@@ -333,6 +345,75 @@ The item can be added directly to cart if you pass the argument as a object
 ```js
 var cart = new inTrader();
 cart.addItem({'ID' : 101, 'itemNumber' : 'product_1', 'price': 12.5, 'weight': 120});
+
+#Complete Order
+``````js
+var cart = new inTrader();
+
+cart.vat().rate(0.25);    // Set the vat rate to 25%
+
+//Add some items to the cart
+cart.addItem({'ID' : 1, 'itemNumber' : 'product_1', 'price': 12.5, 'weight': 122});
+cart.addItem({'ID' : 2, 'itemNumber' : 'product_2', 'price': 22.5, 'weight': 100});
+cart.addItem({'ID' : 3, 'itemNumber' : 'product_3', 'price': 2.5, 'weight': 20});
+cart.addItem({'ID' : 4, 'itemNumber' : 'product_4', 'price': 8.75, 'weight': 28});
+cart.addItem({'ID' : 5, 'itemNumber' : 'product_5', 'price': 125, 'weight': 1200});
+
+cart.totalWeight(); // 1470;
+cart.itemTotal(); // 171.25;
+cart.subTotal(); // 171.25;
+
+cart.shipment().fee(75);
+cart.payment().fee(4.78);
+cart.itemTotal(); // 171.25
+cart.subTotal(); // 251.03
+
+cart.vatTotal() // 42.8125
+
+cart.payment().registered(); // false
+
+cart.addCurrency({'code' : 'SEK', 'rate' : 1});
+cart.addCurrency({'code' : 'EUR', 'rate' : 0.11368, 'symbol': '€'});
+cart.addCurrency({'code' : 'GBP', 'rate' : 0.093750761});
+cart.addCurrency({'code' : 'USD', 'rate' : 0.152744});
+
+cart.itemTotal('SEK') // 171.25;
+cart.subTotal('SEK') // 251.03;
+
+cart.itemTotal('EUR') // 19.4677;
+cart.itemTotal('GBP') // 16.05481782125;
+cart.itemTotal('USD') // 26.15741;
+
+cart.subTotal('EUR') // 28.5370904;
+cart.subTotal('GBP') // 23.53425353383;
+cart.subTotal('USD') // 38.343326319999996;
+
+cart.vatTotal('EUR') // 4.866925;
+cart.vatTotal('GBP') // 4.0137044553125;
+cart.vatTotal('USD') // 6.5393525;
+
+cart.customer().firstName('Ragnar');
+cart.customer().lastName('Röök');
+cart.customer().customerNumber('-');
+cart.customer().pinNumber('560312-1212');
+cart.customer().address('Valhallavägen 7');
+cart.customer().address2('c/o Sleipner Johansson');
+cart.customer().zip('112 34');
+cart.customer().city('Lokeborg');
+cart.customer().country('Sweden');
+cart.customer().countryCode('se');
+cart.customer().deliveryAddress('');
+cart.customer().deliveryZip('');
+cart.customer().deliveryCity('');
+cart.customer().email('ragnar.rook@vhammaren.se');
+cart.customer().mobileNumber('0737212345');
+cart.customer().company('AB BB');
+cart.customer().vatNumber('SE560312121201');
+
+cart.payment().registered(true);
+
+cart.reset();
+cart.payment().registered() // false;
 ```
 
 ## Feedback How to Contribute
