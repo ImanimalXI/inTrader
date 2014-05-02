@@ -1,3 +1,8 @@
+/**
+ * @venus-library mocha
+ * @venus-code ../lib/inTrader.js
+ */
+
 var should = require('should');
 var inTrader = require('../lib/inTrader.js');
 var inTraderItem = require('../lib/inTraderItem.js');
@@ -105,7 +110,7 @@ describe('inTrader', function() {
         cart.totalWeight().should.not.be.below(0);
         cart.totalWeight().should.be.a.Number;
 
-        //TODO handle incorrect weitht values
+        //TODO handle incorrect weight values
     });
 
     it('should have VAT amount and rate', function(){
@@ -208,7 +213,6 @@ describe('inTrader', function() {
         cart.subTotal().should.equal(30);
 
         cart.shipment().fee().should.not.be.below(0);
-        //TODO set zone make sure it's a number
     });
 
     it('it should be able to add item', function(){
@@ -426,7 +430,6 @@ describe('inTrader', function() {
         cart.payment().should.have.property('method');
         cart.payment().should.have.property('fee');
         cart.payment().should.have.property('text');
-
     });
 
     it('it should be able to handle an incorrect shipment values', function(){
@@ -484,7 +487,6 @@ describe('inTrader', function() {
 
     it('it should be able to handle an incorrect vat rates', function(){
         var cart = new inTrader();
-
     });
 
     it('it should be able to remove item', function(){
@@ -661,15 +663,182 @@ describe('inTrader', function() {
 
         cart.reset();
         cart.payment().registered().should.be.false;
+    });
 
+    it('should have be able to dump to JSON', function() {
+        var cart = new inTrader();
+        var cartJSON = '';
+
+        cart.vat().rate(0.25);
+
+        cart.addItem({'ID' : 1, 'itemNumber' : 'product_1', 'price': 12.5, 'weight': 122});
+        cart.addItem({'ID' : 2, 'itemNumber' : 'product_2', 'price': 22.5, 'weight': 100});
+        cart.addItem({'ID' : 3, 'itemNumber' : 'product_3', 'price': 2.5, 'weight': 20});
+        cart.addItem({'ID' : 4, 'itemNumber' : 'product_4', 'price': 8.75, 'weight': 28});
+        cart.addItem({'ID' : 5, 'itemNumber' : 'product_5', 'price': 125, 'weight': 1200});
+
+        cart.shipment().method('Standard');
+        cart.shipment().fee(75);
+        //TODO convert possible number to accepted format, String for zone
+        cart.shipment().zone('1');
+
+        cart.payment().fee(4.78);
+        cart.payment().method('Paypal');
+        cart.payment().text('Something to pay');
+
+        cart.addCurrency({'code' : 'SEK', 'rate' : 1});
+        cart.addCurrency({'code' : 'EUR', 'rate' : 0.11368, 'symbol': '€'});
+        cart.addCurrency({'code' : 'GBP', 'rate' : 0.093750761});
+        cart.addCurrency({'code' : 'USD', 'rate' : 0.152744});
+
+        cart.customer().firstName('Ragnar');
+        cart.customer().lastName('Röök');
+        cart.customer().customerNumber('-');
+        cart.customer().pinNumber('560312-1212');
+        cart.customer().address('Valhallavägen 7');
+        cart.customer().address2('c/o Sleipner Johansson');
+        cart.customer().zip('112 34');
+        cart.customer().city('Lokeborg');
+        cart.customer().country('Sweden');
+        cart.customer().countryCode('se');
+        cart.customer().deliveryAddress('');
+        cart.customer().deliveryZip('');
+        cart.customer().deliveryCity('');
+        cart.customer().email('ragnar.rook@vhammaren.se');
+        cart.customer().mobileNumber('0737212345');
+        cart.customer().company('AB BB');
+        cart.customer().vatNumber('SE560312121201');
+
+        cart.payment().registered(true);
+
+        cart.should.have.property('toJSON');
+
+        cartJSON = cart.toJSON();
+        console.log(cartJSON);
+
+        /*cartJSON.should.have.property('payment');
+        cartJSON.should.have.property('customer');
+        cartJSON.should.have.property('items');
+        cartJSON.should.have.property('vat');
+        cartJSON.should.have.property('currencies');
+
+        cartJSON.should.have.property('orderDate');
+        cartJSON.should.have.property('expiryDate');
+        cartJSON.should.have.property('invoiceNumber');
+        cartJSON.should.have.property('orderNumber');
+
+        cartJSON.should.have.property('subTotal');
+        cartJSON.should.have.property('itemTotal');
+        cartJSON.should.have.property('vatTotal');
+        cartJSON.should.have.property('totalWeight');
+        cartJSON.should.have.property('baseCurrency');
+
+        cartJSON.shipment.should.have.property('method');
+        cartJSON.shipment.should.have.property('fee');
+        cartJSON.shipment.should.have.property('zone');
+        cartJSON.shipment.method.should.be.a.String;
+        cartJSON.shipment.zone.should.be.a.String;
+        cartJSON.shipment.fee.should.be.a.Number;
+
+        cartJSON.payment.should.have.property('registered');
+        cartJSON.payment.should.have.property('method');
+        cartJSON.payment.should.have.property('fee');
+        cartJSON.payment.should.have.property('text');
+        cartJSON.payment.registered.should.be.a.Boolean;
+        cartJSON.payment.text.should.be.a.String;
+        cartJSON.payment.method.should.be.a.String;
+        cartJSON.payment.fee.should.be.a.Number;
+
+        cartJSON.vat.should.have.property('rate');
+
+        cartJSON.shipment.fee.should.equal(75);
+        cartJSON.shipment.method.should.equal('Standard');
+        cartJSON.shipment.zone.should.equal('1');
+
+        cartJSON.payment.method.should.equal('Paypal');
+        cartJSON.payment.text.should.equal('Something to pay');
+        cartJSON.payment.registered.should.equal(true);
+        cartJSON.payment.fee.should.equal(4.78);
+
+        cartJSON.vat.rate.should.equal(0.25);
+
+        cartJSON.should.have.property('customer');
+        cartJSON.should.have.property('items');
+        cartJSON.should.have.property('vat');
+        cartJSON.should.have.property('currencies');
+
+        cartJSON.payment.should.have.property('registered');
+        cartJSON.payment.should.have.property('method');
+        cartJSON.payment.should.have.property('fee');
+        cartJSON.payment.should.have.property('text');
+        cartJSON.payment.method.should.be.a.String;
+        cartJSON.payment.text.should.be.a.String;
+        cartJSON.payment.fee.should.be.a.Number;
+        cartJSON.payment.registered.should.be.a.Boolean;
+
+        cartJSON.customer.firstName.should.equal('Ragnar');
+        cartJSON.customer.lastName.should.equal('Röök');
+        cartJSON.customer.customerNumber.should.equal('-');
+        cartJSON.customer.pinNumber.should.equal('560312-1212');
+        cartJSON.customer.address.should.equal('Valhallavägen 7');
+        cartJSON.customer.address2.should.equal('c/o Sleipner Johansson');
+        cartJSON.customer.zip.should.equal('112 34');
+        cartJSON.customer.city.should.equal('Lokeborg');
+        cartJSON.customer.country.should.equal('Sweden');
+        cartJSON.customer.countryCode.should.equal('se');
+        cartJSON.customer.deliveryAddress.should.equal('');
+        cartJSON.customer.deliveryZip.should.equal('');
+        cartJSON.customer.deliveryCity.should.equal('');
+        cartJSON.customer.email.should.equal('ragnar.rook@vhammaren.se');
+        cartJSON.customer.mobileNumber.should.equal('0737212345');
+        cartJSON.customer.company.should.equal('AB BB');
+        cartJSON.customer.vatNumber.should.equal('SE560312121201');
+
+        cartJSON.items[0].ID.should.equal(1);
+        cartJSON.items[0].itemNumber.should.equal('product_1');
+        cartJSON.items[0].price.should.equal(12.5);
+        cartJSON.items[0].weight.should.equal(122);
+
+        cartJSON.items[1].ID.should.equal(2);
+        cartJSON.items[1].itemNumber.should.equal('product_2');
+        cartJSON.items[1].price.should.equal(22.5);
+        cartJSON.items[1].weight.should.equal(100);
+
+        cartJSON.items[2].ID.should.equal(3);
+        cartJSON.items[2].itemNumber.should.equal('product_3');
+        cartJSON.items[2].price.should.equal(2.5);
+        cartJSON.items[2].weight.should.equal(20);
+
+        cartJSON.items[3].ID.should.equal(4);
+        cartJSON.items[3].itemNumber.should.equal('product_4');
+        cartJSON.items[3].price.should.equal(8.75);
+        cartJSON.items[3].weight.should.equal(28);
+
+        cartJSON.items[4].ID.should.equal(5);
+        cartJSON.items[4].itemNumber.should.equal('product_5');
+        cartJSON.items[4].price.should.equal(125);
+        cartJSON.items[4].weight.should.equal(1200);
+
+        cartJSON.itemTotal.should.equal(171.25);
+        cartJSON.subTotal.should.equal(251.03);
+        //cartJSON.payment.registered.should.be.true;
+
+        cartJSON.totalWeight.should.equal(1470);
+        cartJSON.itemTotal.should.equal(171.25);
+        cartJSON.subTotal.should.equal(251.03);
+        cartJSON.vatTotal.should.equal(42.8125);*/
+
+        //cart.reset();
+        //cartJSON = cart.toJSON();
+
+        //cartJSON.payment.registered.should.be.false;
     });
 
     //TODO add promo code
     //TODO add discount
     //TODO Shipment delivered
-    //TODO Email validation
-    //TODO valid country code format
-    //TODO Separte Objects test
+    //TODO Document valid country code format
+    //TODO Separate Objects test
 
 
 });

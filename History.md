@@ -1,3 +1,9 @@
+0.1.3 / 2014-04-XX
+==================
+
+  * added toJSON function
+  * Customer email validation
+
 0.0.2 / 2014-04-13
 ==================
 

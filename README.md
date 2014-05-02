@@ -225,6 +225,17 @@ cart.addItem({'ID' : 101, 'itemNumber' : 'product_1', 'price': 10, 'weight': 120
 cart.weight() //120
 ```
 
+## .toJSON
+Return cart in JSON format
+
+```js
+var cart = new inTrader();
+cart.addItem({'ID' : 101, 'itemNumber' : 'product_1', 'price': 10, 'weight': 120});
+cartJSON = cart.toJSON();
+console.log(cartJSON.items[0].itemNumber); // product_1
+
+```
+
 # Customer Functions
 Set and get for the following customer values,
 ID,
