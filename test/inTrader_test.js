@@ -714,7 +714,6 @@ describe('inTrader', function() {
         cart.should.have.property('toJSON');
 
         cartJSON = cart.toJSON();
-        console.log(cartJSON);
 
         /*cartJSON.should.have.property('payment');
         cartJSON.should.have.property('customer');
